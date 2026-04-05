@@ -1,0 +1,18 @@
+# Dependency folders (Cực kỳ quan trọng, không được bỏ qua)
+node_modules/
+backend/node_modules/
+GK_DNT/node_modules/
+
+# Env files (Chứa mật khẩu, API key - tuyệt đối không đẩy lên)
+.env
+backend/.env
+GK_DNT/.env
+
+# Expo / React Native rác
+GK_DNT/.expo/
+GK_DNT/dist/
+GK_DNT/web-build/
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
