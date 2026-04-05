@@ -1,0 +1,100 @@
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, Text, ActivityIndicator, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
+import { registerApi } from '../../services/authService';
+import Toast from 'react-native-toast-message';
+
+export default function RegisterScreen() {
+    const [userName, setUserName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    const handleRegister = async () => {
+        if (!userName || !email || !password) {
+            Toast.show({ type: 'error', text1: 'Lỗi', text2: 'Vui lòng điền đầy đủ thông tin' });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await registerApi(userName, email.trim(), password);
+
+            if (res.success) {
+                Toast.show({ type: 'success', text1: 'Thành công', text2: res.message });
+                // Đăng ký xong thì đá về trang Login
+                setTimeout(() => router.replace('/(auth)/login'), 1500);
+            }
+        } catch (error: any) {
+            Toast.show({
+                type: 'error',
+                text1: 'Đăng ký thất bại',
+                text2: error.message || 'Có lỗi xảy ra'
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="bg-slate-50">
+            <View className="justify-center flex-1 p-6">
+                <View className="p-8 bg-white shadow-sm rounded-3xl">
+                    <Text className="mb-2 text-3xl font-extrabold text-slate-800">Tạo Tài Khoản</Text>
+                    <Text className="mb-8 text-slate-500">Tham gia cùng chúng tôi ngay hôm nay</Text>
+
+                    <View className="space-y-4">
+                        <TextInput
+                            className="p-4 mb-4 bg-slate-100 rounded-xl text-slate-800"
+                            placeholder="Họ và tên"
+                            placeholderTextColor="#94a3b8"
+                            value={userName}
+                            onChangeText={setUserName}
+                        />
+
+                        <TextInput
+                            className="p-4 mb-4 bg-slate-100 rounded-xl text-slate-800"
+                            placeholder="Email"
+                            placeholderTextColor="#94a3b8"
+                            value={email}
+                            onChangeText={setEmail}
+                            autoCapitalize="none"
+                            keyboardType="email-address"
+                        />
+
+                        <TextInput
+                            className="p-4 bg-slate-100 rounded-xl text-slate-800"
+                            placeholder="Mật khẩu"
+                            placeholderTextColor="#94a3b8"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                        />
+                    </View>
+
+                    <TouchableOpacity
+                        className={`mt-8 p-4 rounded-xl items-center ${loading ? 'bg-green-400' : 'bg-green-600'}`}
+                        onPress={handleRegister}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <Text className="text-lg font-bold text-white">Đăng ký</Text>
+                        )}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => router.push('/(auth)/login')}
+                        className="mt-6"
+                    >
+                        <Text className="text-center text-slate-600">
+                            Đã có tài khoản? <Text className="font-bold text-blue-600">Đăng nhập</Text>
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </ScrollView>
+    );
+}
